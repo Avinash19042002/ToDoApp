@@ -1,15 +1,19 @@
 package com.example.android.dometodoapp.Model;
 
+import com.example.android.dometodoapp.R;
+
 public class ToDoModel extends TaskId {
    private String tasks,due;
     private int status;
-public ToDoModel(){
+    private int status_star= R.drawable.ic_baseline_star_border_24;
 
-}
-    public ToDoModel(String tasks, String due, int status) {
-        this.tasks = tasks;
-        this.due = due;
-        this.status = status;
+
+    public int getStatus_star() {
+        return status_star;
+    }
+
+    public void setStatus_star(int status_star) {
+        this.status_star = status_star;
     }
 
     public String getTasks() {

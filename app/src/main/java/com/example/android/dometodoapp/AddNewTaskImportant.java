@@ -32,16 +32,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AddNewTask extends BottomSheetDialogFragment {
-    public static final String TAG = "AddNewTask";
+public class AddNewTaskImportant extends BottomSheetDialogFragment
+{
+    private static final String TAG = "AddNewTaskImportant";
 
-    private TodayActivity todayActivity;
+    private ImportantActivity importantActivity;
 
 
     private EditText mTaskEdit; //task_edit_today
@@ -54,24 +54,24 @@ public class AddNewTask extends BottomSheetDialogFragment {
     private String dueDate="";
     private String dueDateUpdate="";
     private String id="";
-    public static AddNewTask newInstance(){
-            return new AddNewTask();
+    public static AddNewTaskImportant newInstance(){
+        return new AddNewTaskImportant();
     }
 
     @Nullable
 
     @Override
-    public View onCreateView(@NonNull  LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.add_new_task,container,false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.add_new_task_important,container,false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mTaskEdit = (EditText)view.findViewById(R.id.task_edit_today);
-        mVoiceType=(TextView)view.findViewById(R.id.voice_type_today);
-        mSave=(TextView)view.findViewById(R.id.save_task_today);
-        msetDue=(TextView)view.findViewById(R.id.set_due_today);
-        mCancel=(TextView)view.findViewById(R.id.cancel_task_today);
+        mTaskEdit = (EditText)view.findViewById(R.id.task_edit_important);
+        mVoiceType=(TextView)view.findViewById(R.id.voice_type_important);
+        mSave=(TextView)view.findViewById(R.id.save_task_important);
+        msetDue=(TextView)view.findViewById(R.id.set_due_important);
+        mCancel=(TextView)view.findViewById(R.id.cancel_task_important);
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         boolean isUpdate =false;
@@ -85,7 +85,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
             msetDue.setText(dueDateUpdate);
             if(task.length()>0){
                 mSave.setEnabled(false);
-            mSave.setBackgroundColor(Color.GRAY);
+                mSave.setBackgroundColor(Color.GRAY);
             }
         }
 
@@ -97,14 +97,14 @@ public class AddNewTask extends BottomSheetDialogFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-             if(s.toString().equals("")){
-                 mSave.setEnabled(false);
-                 mSave.setBackgroundColor(Color.GRAY);
-             }
-             else{
-                 mSave.setEnabled(true);
-                 mSave.setBackgroundColor(Color.GREEN);
-             }
+                if(s.toString().equals("")){
+                    mSave.setEnabled(false);
+                    mSave.setBackgroundColor(Color.GRAY);
+                }
+                else{
+                    mSave.setEnabled(true);
+                    mSave.setBackgroundColor(Color.GREEN);
+                }
             }
 
             @Override
@@ -123,9 +123,9 @@ public class AddNewTask extends BottomSheetDialogFragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                     month = month +1;
-                     msetDue.setText(dayOfMonth+"/"+month+"/"+year);
-                     dueDate =dayOfMonth+"/"+month+"/"+year;
+                        month = month +1;
+                        msetDue.setText(dayOfMonth+"/"+month+"/"+year);
+                        dueDate =dayOfMonth+"/"+month+"/"+year;
                     }
                 },YEAR,MONTH,DAY);
                 datePickerDialog.show();
@@ -150,53 +150,53 @@ public class AddNewTask extends BottomSheetDialogFragment {
 
         boolean finalIsUpdate = isUpdate;
         mSave.setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-             String task = mTaskEdit.getText().toString();
+                String task = mTaskEdit.getText().toString();
 
-             if(finalIsUpdate){
-           firebaseFirestore.collection("Today").document(id).update("tasks",task,"due",dueDate);
-           Toast.makeText(context,"Task Updated",Toast.LENGTH_LONG).show();
-             }
-             else {
-                 if (task.isEmpty()) {
-                     Toast.makeText(context, "Empty task not Allowed!!", Toast.LENGTH_SHORT).show();
-                 } else {
+                if(finalIsUpdate){
+                    firebaseFirestore.collection("Today").document(id).update("tasks",task,"due",dueDate);
+                    Toast.makeText(context,"Task Updated",Toast.LENGTH_LONG).show();
+                }
+                else {
+                    if (task.isEmpty()) {
+                        Toast.makeText(context, "Empty task not Allowed!!", Toast.LENGTH_SHORT).show();
+                    } else {
 
-                     Map<String, Object> taskMap = new HashMap<>();
-                     taskMap.put("tasks", task);
-                     taskMap.put("due", dueDate);
-                     taskMap.put("status", 0);
-                     taskMap.put("star_status",R.drawable.ic_baseline_star_border_24);
-                     taskMap.put("time", FieldValue.serverTimestamp());
-                     // it is for table of today activity
-                     firebaseFirestore.collection("Today").add(taskMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                         @Override
-                         public void onComplete(@NonNull Task<DocumentReference> task) {
-                             if (task.isSuccessful()) {
-                                 Toast.makeText(context, "Task Saved", Toast.LENGTH_LONG).show();
-                             } else {
-                                 Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                             }
-                         }
-                     })
-                             .addOnFailureListener(new OnFailureListener() {
-                                 @Override
-                                 public void onFailure(@NonNull Exception e) {
-                                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                                 }
-                             });
+                        Map<String, Object> taskMap = new HashMap<>();
+                        taskMap.put("tasks", task);
+                        taskMap.put("due", dueDate);
+                        taskMap.put("status", 0);
+                        taskMap.put("star_status",R.drawable.ic_baseline_star_border_24);
+                        taskMap.put("time", FieldValue.serverTimestamp());
+                        // it is for table of today activity
+                        firebaseFirestore.collection("Today").add(taskMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentReference> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(context, "Task Saved", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(context, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
 
-                 }
-             }
+                    }
+                }
 
 
-             dismiss();
-         }
-     });
+                dismiss();
+            }
+        });
 
-       // super.onViewCreated(view, savedInstanceState);
+        // super.onViewCreated(view, savedInstanceState);
     }
 
 
@@ -207,7 +207,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
     }
 
     @Override
-    public void onDismiss(@NonNull  DialogInterface dialog) {
+    public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
         Activity activity =getActivity();
         if(activity instanceof OnDialogCloseListener){
@@ -227,3 +227,4 @@ public class AddNewTask extends BottomSheetDialogFragment {
         }
     }
 }
+

@@ -10,78 +10,65 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.dometodoapp.AddNewTask;
+import com.example.android.dometodoapp.AddNewTaskPending;
 import com.example.android.dometodoapp.ImportantActivity;
-import com.example.android.dometodoapp.MainActivity;
-
 import com.example.android.dometodoapp.Model.ToDoModel;
+import com.example.android.dometodoapp.PendingActivity;
 import com.example.android.dometodoapp.R;
-import com.example.android.dometodoapp.TodayActivity;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-// this is adapter for Today Activity
+public class PendingAdapter extends RecyclerView.Adapter<PendingAdapter.PendingViewHolder> {
 
-public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> {
-    private ArrayList<ToDoModel>todaylist,importantlist;
-    private TodayActivity activity;
-
-
-
+    private ArrayList<ToDoModel> pendinglist;
+    private PendingActivity pendingActivity;
     private FirebaseFirestore firestore;
-
-    //constructor to set data
-    public ToDoAdapter(TodayActivity todayActivity,ArrayList<ToDoModel>todaylist) {
-     this.activity=todayActivity;
-     this.todaylist= todaylist;
+    public PendingAdapter(PendingActivity activity,ArrayList<ToDoModel>pendinglist) {
+        this.pendinglist = pendinglist;
+        this.pendingActivity = activity;
     }
-
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(activity).inflate(R.layout.singlerow,parent,false);
+    public PendingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(pendingActivity).inflate(R.layout.singlerow,parent,false);
         firestore = FirebaseFirestore.getInstance();
-        return new MyViewHolder(view);
-    }
-
-    public void deleteTask(int position){
-        ToDoModel toDoModel = todaylist.get(position);
-        firestore.collection("Today").document(toDoModel.TaskId).delete();
-        todaylist.remove(position);
-        notifyItemRemoved(position);
+        return new PendingViewHolder(view);
     }
     public Context getContext(){
-        return activity;
+        return pendingActivity;
     }
 
-    public void editTask(int position){
-        ToDoModel toDoModel = todaylist.get(position);
+    //changes made
+    public void deleteTaskPending(int position){
+        ToDoModel toDoModel = pendinglist.get(position);
+        firestore.collection("Today").document(toDoModel.TaskId).delete();
+        pendinglist.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    //changes made
+    public void editTaskPending(int position){
+        ToDoModel toDoModel = pendinglist.get(position);
         Bundle bundle = new Bundle();
         bundle.putString("task",toDoModel.getTasks());
         bundle.putString("Due",toDoModel.getDue());
         bundle.putString("id",toDoModel.TaskId);
 
-        AddNewTask addNewTask =new AddNewTask();
-        addNewTask.setArguments(bundle);
-        addNewTask.show(activity.getSupportFragmentManager(), addNewTask.getTag());
+        AddNewTaskPending addNewTaskPending =new AddNewTaskPending();
+        addNewTaskPending.setArguments(bundle);
+        addNewTaskPending.show(pendingActivity.getSupportFragmentManager(), addNewTaskPending.getTag());
     }
 
+
     @Override
-    public void onBindViewHolder(@NonNull ToDoAdapter.MyViewHolder holder, int position) {
-        ToDoModel toDoModel = todaylist.get(position);
+    public void onBindViewHolder(@NonNull PendingAdapter.PendingViewHolder holder, int position) {
+        ToDoModel toDoModel = pendinglist.get(position);
         holder.mCheckBox.setText(toDoModel.getTasks());
         holder.mDueDateTv.setText("Due On "+toDoModel.getDue());
         holder.mCheckBox.setChecked(convert(toDoModel.getStatus()));
@@ -100,6 +87,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
             }
         });
 
+
         holder.mstar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +100,7 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
                 }
                 else if(state ==R.drawable.ic_baseline_star_24){
                     toDoModel.setStatus_star(R.drawable.ic_baseline_star_border_24);
-                   holder.mstar.setImageResource(R.drawable.ic_baseline_star_border_24);
+                    holder.mstar.setImageResource(R.drawable.ic_baseline_star_border_24);
                     firestore.collection("Today").document(toDoModel.TaskId).update("star_status",R.drawable.ic_baseline_star_border_24);
 
                 }
@@ -126,14 +114,14 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.MyViewHolder> 
 
     @Override
     public int getItemCount() {
-        return todaylist.size();
+        return pendinglist.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class PendingViewHolder extends RecyclerView.ViewHolder{
         TextView mDueDateTv;
         CheckBox mCheckBox;
         ImageView mstar;
-        public MyViewHolder(@NonNull View itemView) {
+        public PendingViewHolder(@NonNull View itemView) {
             super(itemView);
             mDueDateTv = itemView.findViewById(R.id.due_date_tv);
             mCheckBox = itemView.findViewById(R.id.mcheckbox);

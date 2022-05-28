@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -24,7 +25,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
 public class TodayActivity extends AppCompatActivity implements OnDialogCloseListener{
 private RecyclerView rcvToday;// id = recv_today
 private FloatingActionButton fabToday;//id = fab_today
@@ -58,6 +58,7 @@ private FloatingActionButton fabToday;//id = fab_today
             }
         });
 
+
         firestore = FirebaseFirestore.getInstance();
         list = new ArrayList<>();
         adapter = new ToDoAdapter(TodayActivity.this,list);
@@ -88,6 +89,9 @@ private FloatingActionButton fabToday;//id = fab_today
             }
         });
     }
+    public Context getContext(){
+        return TodayActivity.this;
+    }
 
     @Override
     public void onDialogClose(DialogInterface dialogInterface) {
@@ -95,4 +99,5 @@ private FloatingActionButton fabToday;//id = fab_today
         retrieveData();
         adapter.notifyDataSetChanged();
     }
+
 }
